@@ -31,7 +31,7 @@ public class AuthService {
 	
     public AuthResponse register(RegisterRequest request) {
 
-    	Set<Role> roles=roleRepository.findById(1).stream().collect(Collectors.toSet());
+    	Set<Role> roles=roleRepository.findById(1).stream().collect(Collectors.toSet());//USER
     	
 
         User user = User.builder()
@@ -51,9 +51,9 @@ public class AuthService {
         User user = userRepository.findByUserName(request.getUserName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        String encodedPassword=passwordEncoder.encode(request.getPassword());
+        //String encodedPassword=passwordEncoder.encode(request.getPassword());
         
-        System.out.print("Encoded Password->"+encodedPassword+" DB Password->"+user.getPassword()+" T/F->"+encodedPassword.equals(user.getPassword()));
+        //System.out.print("Encoded Password->"+encodedPassword+" DB Password->"+user.getPassword()+" T/F->"+encodedPassword.equals(user.getPassword()));
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid password");
         }

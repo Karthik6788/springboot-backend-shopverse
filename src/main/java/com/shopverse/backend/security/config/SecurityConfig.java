@@ -30,9 +30,11 @@ public class SecurityConfig {
 		return http.csrf().disable()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                        )      
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAthenticationFilter, UsernamePasswordAuthenticationFilter.class)//athentication token
                 .build();
 	}
 	

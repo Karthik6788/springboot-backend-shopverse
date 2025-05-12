@@ -1,22 +1,17 @@
 package com.shopverse.backend.controller;
 
-import java.nio.file.Path;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api")
-public class HealthController {
+@RequestMapping("/admin")
+public class AdminController {
 	
 	@GetMapping("/ping")
-	public ResponseEntity<String> ping(){
-		
-		return ResponseEntity.ok("shopverse is online");
+	public ResponseEntity<String> adminPing(){
+		return ResponseEntity.ok("Admin Page is live");
 	}
-
 
 }

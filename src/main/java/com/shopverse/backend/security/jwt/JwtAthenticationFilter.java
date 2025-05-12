@@ -28,7 +28,7 @@ public class JwtAthenticationFilter extends OncePerRequestFilter  {
 			throws ServletException, IOException {
 		String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            chain.doFilter(request, response);
+            chain.doFilter(request, response);//403 forbideen error
             return;
         }
 
@@ -45,7 +45,7 @@ public class JwtAthenticationFilter extends OncePerRequestFilter  {
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
-        chain.doFilter(request, response);
+        chain.doFilter(request, response);//security 
 		
 	}
 
