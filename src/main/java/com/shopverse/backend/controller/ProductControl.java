@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.shopverse.backend.dto.ProductDTO;
-import com.shopverse.backend.dto.ProductResponse;
+import com.shopverse.backend.dto.ProductRequestDto;
+import com.shopverse.backend.dto.ProductResponseDto;
 import com.shopverse.backend.service.ProductService;
 
 @RestController
@@ -26,25 +26,25 @@ public class ProductControl {
 	
 	
 	@PostMapping()
-	public ResponseEntity<?> saveProduct(@ModelAttribute ProductDTO productDto){
+	public ResponseEntity<?> saveProduct(@ModelAttribute ProductRequestDto productRequestDto){
 		
-		return productService.saveProduct(productDto);
+		return productService.saveProduct(productRequestDto);
 		
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<ProductResponse> getProductById(@PathVariable int id){
+	public ResponseEntity<ProductResponseDto> getProductById(@PathVariable int id){
 		return productService.getProductById(id);
 	}
 	
 	@GetMapping()
-	public ResponseEntity<List<ProductResponse>> getAllProducts(){
+	public ResponseEntity<List<ProductResponseDto>> getAllProducts(){
 		return productService.getAllProducts();
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<String> updateProductById(@PathVariable int id,@ModelAttribute ProductDTO productDto) throws IOException{
-		return productService.updateProductById(id,productDto);
+	public ResponseEntity<String> updateProductById(@PathVariable int id,@ModelAttribute ProductRequestDto productRequestDto) throws IOException{
+		return productService.updateProductById(id,productRequestDto);
 	} 
 	
 

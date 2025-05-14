@@ -1,8 +1,6 @@
 package com.shopverse.backend.config;
 
 
-import java.rmi.registry.Registry;
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

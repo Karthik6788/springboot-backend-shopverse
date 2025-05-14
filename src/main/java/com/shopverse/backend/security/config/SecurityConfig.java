@@ -29,12 +29,13 @@ public class SecurityConfig {
 	public SecurityFilterChain	filterChain(HttpSecurity http) throws Exception {
 		return http.csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                        )      
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAthenticationFilter, UsernamePasswordAuthenticationFilter.class)//athentication token
+                        //.requestMatchers("/**").permitAll()
+                        //.requestMatchers("/admin/**").hasRole("ADMIN")
+                        //.anyRequest().authenticated()
+                		.anyRequest().permitAll()
+                )      
+                //.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                //.addFilterBefore(jwtAthenticationFilter, UsernamePasswordAuthenticationFilter.class)//athentication token
                 .build();
 	}
 	

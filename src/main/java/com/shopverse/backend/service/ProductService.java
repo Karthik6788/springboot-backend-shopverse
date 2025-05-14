@@ -16,9 +16,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.shopverse.backend.dto.ProductDTO;
-import com.shopverse.backend.dto.ProductResponse;
+import com.shopverse.backend.dto.CategoryRequestDto;
+import com.shopverse.backend.dto.CategoryResponseDto;
+import com.shopverse.backend.dto.ProductRequestDto;
+import com.shopverse.backend.dto.ProductResponseDto;
+import com.shopverse.backend.model.Category;
 import com.shopverse.backend.model.Product;
+import com.shopverse.backend.repository.CategoryRepository;
 import com.shopverse.backend.repository.ProductRepository;
 
 
@@ -31,7 +35,10 @@ public class ProductService {
 	@Autowired
 	private ProductRepository productRepository;
 	
-	public ResponseEntity<String> saveProduct(ProductDTO productDto){
+	@Autowired
+	private CategoryRepository categoryRepository;
+	
+	public ResponseEntity<String> saveProduct(ProductRequestDto productRequestDto){
 		//create a folder if not exists
 		//if folder exists, create a path name where we store the imageFile
 		//save the image
@@ -44,7 +51,7 @@ public class ProductService {
 			}
 			
 			//Save the MultipartFile
-			MultipartFile imageFile=productDto.getImageFile();
+			MultipartFile imageFile=productRequestDto.getImageFile();
 			String originalFileName=StringUtils.cleanPath(imageFile.getOriginalFilename());
 			String fileExtension=originalFileName.substring(originalFileName.lastIndexOf("."));
 			String uniqueFileName=UUID.randomUUID()+fileExtension;
@@ -59,13 +66,28 @@ public class ProductService {
 			
 			Product product=new Product();
 			
-			product.setName(productDto.getName());
-			product.setDescription(productDto.getDescription());
+			product.setName(productRequestDto.getName());
+			product.setDescription(productRequestDto.getDescription());
 			product.setImageURL(fileUrl);
-			product.setPrice(productDto.getPrice());
-			product.setQuantity(product.getQuantity());
+			product.setPrice(productRequestDto.getPrice());
+			product.setQuantity(productRequestDto.getQuantity());
 			
-			productRepository.save(product);
+			
+			Optional<Category> category=categoryRepository.findByName(productRequestDto.getCategoryRequestDto().getName());
+			// check if category is present
+			if(!category.isPresent()) {
+				Category category2=new Category();
+				category2.setName(productRequestDto.getCategoryRequestDto().getName());
+				category2=categoryRepository.save(category2);
+				product.setCategory(category2);
+				productRepository.save(product);
+			}
+			else {
+				product.setCategory(category.get());
+				productRepository.save(product);
+			}
+		
+			
 			
 		} catch (Exception e) {
 			return ResponseEntity.status(500).body("Failed to upload File"+e.getMessage());
@@ -76,43 +98,45 @@ public class ProductService {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public ResponseEntity<ProductResponse> getProductById(int id){
+	public ResponseEntity<ProductResponseDto> getProductById(int id){
 		
-		ProductResponse productResponse=new ProductResponse();
+		ProductResponseDto productResponseDto=new ProductResponseDto();
 		
-		Product product=productRepository.getReferenceById(id);
-		productResponse.setName(product.getName());
-		productResponse.setDescription(product.getDescription());
-		productResponse.setImageFileUrl(product.getImageURL());
-		product.setPrice(product.getPrice());
-		product.setQuantity(product.getQuantity());
-		product.setProductId(product.getProductId());
-		
-		return ResponseEntity.ok(productResponse);
+		Product product=productRepository.findById(id).orElseThrow();
+		productResponseDto.setName(product.getName());
+		productResponseDto.setDescription(product.getDescription());
+		productResponseDto.setImageFileUrl(product.getImageURL());
+		productResponseDto.setPrice(product.getPrice());
+		productResponseDto.setQuantity(product.getQuantity());
+		CategoryResponseDto categoryResponseDto=new CategoryResponseDto();
+		categoryResponseDto.setName(product.getCategory().getName());
+		productResponseDto.setCategoryResponseDto(categoryResponseDto);
+		return ResponseEntity.ok(productResponseDto);
 		
 	}
 
-	public ResponseEntity<List<ProductResponse>> getAllProducts() {
+	public ResponseEntity<List<ProductResponseDto>> getAllProducts() {
 		// TODO Auto-generated method stub
 		List<Product> products=productRepository.findAll();
-		List<ProductResponse> productResponses=new ArrayList<>();
+		List<ProductResponseDto> productResponseDtos=new ArrayList<>();
 		
 		for(Product product:products) {
-			ProductResponse productResponse=new ProductResponse();
-			productResponse.setName(product.getName());
-			productResponse.setDescription(product.getDescription());
-			productResponse.setImageFileUrl(product.getImageURL());
-			product.setPrice(product.getPrice());
-			product.setQuantity(product.getQuantity());
-			product.setProductId(product.getProductId());
-			productResponses.add(productResponse);
-			
+			ProductResponseDto productResponseDto=new ProductResponseDto();
+			productResponseDto.setName(product.getName());
+			productResponseDto.setDescription(product.getDescription());
+			productResponseDto.setImageFileUrl(product.getImageURL());
+			productResponseDto.setPrice(product.getPrice());
+			productResponseDto.setQuantity(product.getQuantity());
+			CategoryResponseDto categoryResponseDto=new CategoryResponseDto();
+			categoryResponseDto.setName(product.getCategory().getName());
+			productResponseDto.setCategoryResponseDto(categoryResponseDto);
+			productResponseDtos.add(productResponseDto);
 		}
 		
-		return ResponseEntity.ok(productResponses);
+		return ResponseEntity.ok(productResponseDtos);
 	}
 
-	public ResponseEntity<String> updateProductById(int id, ProductDTO productDto) throws IOException {
+	public ResponseEntity<String> updateProductById(int id, ProductRequestDto productRequestDto) throws IOException {
 		// TODO Auto-generated method stub
 		Optional<Product> productOpt=productRepository.findById(id);
 		
@@ -128,7 +152,7 @@ public class ProductService {
 		}
 		
 		//Save the MultipartFile
-		MultipartFile imageFile=productDto.getImageFile();
+		MultipartFile imageFile=productRequestDto.getImageFile();
 		String originalFileName=StringUtils.cleanPath(imageFile.getOriginalFilename());
 		String fileExtension=originalFileName.substring(originalFileName.lastIndexOf("."));
 		String uniqueFileName=UUID.randomUUID()+fileExtension;
@@ -142,13 +166,26 @@ public class ProductService {
 		//creating a product object to save in DB
 		
 		
-		product.setName(productDto.getName());
-		product.setDescription(productDto.getDescription());
+		product.setName(productRequestDto.getName());
+		product.setDescription(productRequestDto.getDescription());
 		product.setImageURL(fileUrl);
-		product.setPrice(productDto.getPrice());
-		product.setQuantity(product.getQuantity());
+		product.setPrice(productRequestDto.getPrice());
+		product.setQuantity(productRequestDto.getQuantity());
 		
-		productRepository.save(product);
+		
+		Optional<Category> category=categoryRepository.findByName(productRequestDto.getCategoryRequestDto().getName());
+		// check if category is present
+		if(!category.isPresent()) {
+			Category category2=new Category();
+			category2.setName(productRequestDto.getCategoryRequestDto().getName());
+			categoryRepository.save(category2);
+			product.setCategory(category2);
+			productRepository.save(product);
+		}
+		else {
+			product.setCategory(category.get());
+			productRepository.save(product);
+		}
 		
 		
 		return ResponseEntity.ok("Product Saved successfully");
