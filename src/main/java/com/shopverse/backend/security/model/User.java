@@ -1,12 +1,18 @@
 package com.shopverse.backend.security.model;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.shopverse.backend.model.Address;
+import com.shopverse.backend.model.Cart;
+import com.shopverse.backend.model.Order;
+import com.shopverse.backend.model.Payment;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,6 +21,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,6 +54,18 @@ public class User implements UserDetails {
 	        inverseJoinColumns = @JoinColumn(name = "role_id")
 	)
 	private Set<Role> roles;
+	
+	@OneToMany(mappedBy = "user")
+	private List<Address> address;
+	
+	@OneToOne(mappedBy = "user")
+	private Cart cart;
+	
+	@OneToMany(mappedBy = "user")
+	private List<Order> order;
+
+	@OneToMany(mappedBy = "user")
+	private List<Payment> payment;
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

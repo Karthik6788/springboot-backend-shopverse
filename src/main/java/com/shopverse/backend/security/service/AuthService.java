@@ -22,6 +22,7 @@ public class AuthService {
 	@Autowired
 	private UserRepository userRepository;
 	
+	
 	@Autowired
 	private RoleRepository roleRepository;
 	@Autowired
@@ -33,13 +34,12 @@ public class AuthService {
 
     	Set<Role> roles=roleRepository.findById(1).stream().collect(Collectors.toSet());//USER
     	
-
+    	
         User user = User.builder()
                 .userName(request.getUserName())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .roles(roles)
                 .build();
-
         userRepository.save(user);
         String token = jwtService.generateToken(user);
         return AuthResponse.builder().token(token).build();
